@@ -1,32 +1,40 @@
+import tensorflow.keras as keras
+from tensorflow.keras.datasets import fashion_mnist
 import numpy as np
 import matplotlib.pyplot as plt
-from tensorflow.keras.datasets import fashion_mnist
-import tensorflow.keras as keras
 
+# Load Fashion MNIST dataset
 (train_x, train_y), (test_x, test_y) = fashion_mnist.load_data()
 
-model = keras.Sequential ([
-    keras.layers.Conv2D(64, (3,3), activation='relu', input_shape=(28,28,1)),
-    keras.layers.MaxPooling2D((2,2)),
+# Define the model
+model = keras.Sequential([
+    keras.layers.Conv2D(64, (3,3), activation='relu', input_shape=(28, 28, 1)),
+    keras.layers.MaxPooling2D((2, 2)),
     keras.layers.Flatten(),
     keras.layers.Dense(128, activation='relu'),
     keras.layers.Dense(10, activation='softmax')
 ])
 
+# Compile the model
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
+# Train the model
 model.fit(train_x, train_y, epochs=5, validation_split=0.2, batch_size=512)
 
+# Evaluate the model
 loss, acc = model.evaluate(test_x, test_y)
 
-labels = ['t_shirt', 'trouser', 'pullover', 'shirt', 'jeans', 'trackpant', 'ankle_boots', 'shoes', 'bag', 'sneakers']
+# Class labels
+labels = ['t_shirt', 'trouser', 'pullover', 'dress', 'coat', 'sandal', 'shirt', 'sneaker', 'bag', 'ankle_boots']
 
+# Make predictions
 predictions = model.predict(test_x[:3])
 
+# Display predictions
 for i, prediction in enumerate(predictions):
     label_index = np.argmax(prediction)
     label = labels[label_index]
     confidence_score = prediction[label_index]
-    print(f"Prediction for image {i+1}: Label: {label}, Confidence: {confidence_score*100:.2f}%")
+    print(f"Prediction for image {i + 1}: Label: {label}, Confidence: {confidence_score * 100:.2f}%")
     plt.imshow(test_x[:3][i])
     plt.show()
