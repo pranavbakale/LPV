@@ -1,0 +1,41 @@
+import numpy as np
+from tensorflow.keras.datasets import imdb
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+# Load and preprocess the data
+(train_data, train_labels), (test_data, test_labels) = imdb.load_data(num_words=10000)
+x_train = np.zeros((len(train_data), 10000))
+for i, seq in enumerate(train_data):
+    x_train[i, seq] = 1
+y_train = np.asarray(train_labels).astype('float32')
+
+# Build the model
+model = Sequential([
+    Dense(16, activation='relu', input_shape=(10000,)),
+    Dense(16, activation='relu'),
+    Dense(1, activation='sigmoid')
+])
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+# Train the model
+history = model.fit(x_train, y_train, validation_split=0.3, epochs=20, verbose=1, batch_size=512)
+
+# Input review index
+review_index = int(input("Enter the index of the review: "))
+
+# Decode review
+word_index = imdb.get_word_index()
+reverse_word_index = {value: key for key, value in word_index.items()}
+decoded_review = ' '.join([reverse_word_index.get(i - 3, '?') for i in train_data[review_index]])
+
+# Print review and label
+print("Review at index {}:".format(review_index))
+print(decoded_review)
+print("Label:", train_labels[review_index])
+if train_labels[review_index] == 0:
+    print("The Review of the movie is Negative")
+elif train_labels[review_index] == 1:
+    print("The review of the movie is Positive")
+else:
+    print("Invalid label")
